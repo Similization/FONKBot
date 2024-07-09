@@ -325,3 +325,4 @@ $RECYCLE.BIN/
 test.py
 music
 .ENV
+config.yaml
