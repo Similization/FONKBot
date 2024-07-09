@@ -24,7 +24,7 @@ class DiscordBot(commands.Bot):
             path_to_music_folder=config.local_music.path_to_music_folder,
             path_to_ffmpeg=config.local_music.path_to_ffmpeg,
         )
-        self.yandex_music = AsyncYandexMusic(token=config.yandex_music.token)
+        self.yandex_music = AsyncYandexMusic(config=config.yandex_music)
 
 
 config = config_discord()
@@ -63,16 +63,19 @@ async def play_next(interaction: nextcord.Interaction, e: Exception = None):
 
     bot.local_music.next_track(count=1)
     await interaction.send(f"Now playing {current_song}")
+    return
 
 
 @bot.event
 async def on_ready():
     print(f"Bot started as {bot.user}")
+    return
 
 
 @bot.slash_command(description="Play FONK")
 async def play(interaction: nextcord.Interaction):
     await play_next(interaction)
+    return
 
 
 @bot.slash_command(description="Play next <count> FONK")
@@ -82,6 +85,7 @@ async def next(interaction: nextcord.Interaction, count: int = 1):
 
     bot.local_music.next_track(count=count - 1)
     await play_next(interaction)
+    return
 
 
 @bot.slash_command(description="Play previous <count> FONK")
@@ -91,6 +95,7 @@ async def previous(interaction: nextcord.Interaction, count: int = 1):
 
     bot.local_music.previous_track(count=count + 1)
     await play_next(interaction)
+    return
 
 
 @bot.slash_command(description="Stop FONK")
@@ -104,6 +109,7 @@ async def stop(interaction: nextcord.Interaction):
         await bot.voice_clients[0].disconnect()
 
     await interaction.send("Stopping FONK")
+    return
 
 
 @bot.slash_command(description="List FONK")
@@ -117,14 +123,16 @@ async def list(interaction: nextcord.Interaction):
         await bot.voice_clients[0].disconnect()
 
     await interaction.send("List of FONK")
+    return
 
 
 @bot.slash_command(description="List FONK")
-async def yam_playlist(interaction: nextcord.Interaction, playlist_name: str):
-    playlist = await bot.yandex_music.search_playlist(
-        playlist_name=playlist_name, in_client=True
-    )
-    await interaction.send(playlist)
+async def download_yam_playlist(interaction: nextcord.Interaction, playlist_name: str):
+    playlist = await bot.yandex_music.search_playlist(playlist_name=playlist_name)
+    await interaction.send(f"Playlist {playlist.title} has been founded and downloaded")
+    await bot.yandex_music.download_playlist(playlist=playlist)
+    bot.local_music.update_tracks()
+    return
 
 
 bot.run(bot.config.discord.token)

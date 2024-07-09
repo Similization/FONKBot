@@ -19,6 +19,11 @@ class LocalMusic:
         self._track_position = 0
         self._track_count = len(self._tracks)
 
+    def update_tracks(self, path_to_music_folder: str):
+        self._tracks = os.listdir(self._path_to_music_folder)
+        self._track_position = 0
+        self._track_count = len(self._tracks)
+
     def get_tracks(self) -> List[str]:
         return self._tracks
 
